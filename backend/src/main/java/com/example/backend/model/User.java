@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.Date;
 
 @Entity
 @Table(name = "users")
@@ -19,4 +20,8 @@ public class User {
     private @Getter @ Setter String email;
     private @Getter @Setter String password;
     private @Getter @Setter String name;
+
+    public Event createEvent(String name, Date startDate, Date endDate){
+        return new Event(name, startDate, endDate);
+    }
 }
