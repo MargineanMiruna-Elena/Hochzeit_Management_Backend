@@ -5,6 +5,8 @@ import com.example.backend.model.User;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.example.backend.dto.LoginRequest;
+import com.example.backend.dto.AuthResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,5 +21,11 @@ public class UserController {
         User savedUser = userService.registerUser(request);
         savedUser.setPassword(null); // don’t send password back
         return savedUser;
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody LoginRequest request){
+        User user = userService.login(request);
+        return new AuthResponse(user.getId(), user.getName(),user.getEmail());
     }
 }
