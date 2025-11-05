@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class CreateOrganizerRequest {
     private String mail;
-    private String userId;
+    private Long userId;
 }
