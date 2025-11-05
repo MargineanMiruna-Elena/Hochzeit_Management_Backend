@@ -86,6 +86,18 @@ public class OrganizerService {
         }
     }
 
+    public List<OrganizerResponse> getAllOrganizers() {
+        List<Organizer> organizers = organizerRepository.findAll();
+
+        return organizers.stream()
+                .map(org -> new OrganizerResponse(
+                        org.getMail(),
+                        org.getUser().getId(),
+                        org.getUser().getName()
+                ))
+                .collect(Collectors.toList());
+    }
+
 
 
 }
