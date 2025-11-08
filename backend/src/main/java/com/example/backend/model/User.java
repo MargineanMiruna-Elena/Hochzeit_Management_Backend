@@ -16,9 +16,13 @@ import java.util.Date;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
+    @Column(name = "email", nullable = false, unique = true)
     private @Getter @ Setter String email;
+    @Column(name = "password", nullable = false)
     private @Getter @Setter String password;
+    @Column(name = "name", nullable = false)
     private @Getter @Setter String name;
 
     public Event createEvent(String name, Date startDate, Date endDate){
