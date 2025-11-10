@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.ChangePasswordRequest;
 import com.example.backend.dto.RegisterRequest;
 import com.example.backend.model.User;
 import com.example.backend.service.UserService;
@@ -28,4 +29,10 @@ public class UserController {
         User user = userService.login(request);
         return new AuthResponse(user.getId(), user.getName(),user.getEmail());
     }
+
+    @PutMapping("/change-password/{userId}")
+    public void changePassword(@PathVariable Long userId, @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(userId, request.getOldPassword(), request.getNewPassword());
+    }
+
 }
