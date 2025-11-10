@@ -2,7 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.RegisterRequest;
 import com.example.backend.model.User;
-import com.example.backend.service.UserService;
+import com.example.backend.service.AuthentificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.example.backend.dto.LoginRequest;
@@ -14,7 +14,7 @@ import com.example.backend.dto.AuthResponse;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private AuthentificationService userService;
 
     @PostMapping("/register")
     public User registerUser(@RequestBody RegisterRequest request) {
