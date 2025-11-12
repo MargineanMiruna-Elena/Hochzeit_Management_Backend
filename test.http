@@ -1,8 +1,11 @@
 #POST http://localhost:8080/api/auth/register
 POST http://localhost:8080/api/auth/login
+#PUT http://localhost:8080/api/auth/change-password/1
 Content-Type: application/json
 
 {
   "email": "bgihy@yahoo.com",
-  "password": "newPassword5678"
+  "password": "newPassword56789"
 }
+
+
