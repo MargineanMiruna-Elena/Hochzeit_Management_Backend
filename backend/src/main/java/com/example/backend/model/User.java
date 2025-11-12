@@ -24,6 +24,13 @@ public class User {
     private @Getter @Setter String password;
     @Column(name = "name", nullable = false)
     private @Getter @Setter String name;
+    
+
+    public User(String email, String password, String name) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+    }
 
     public Event createEvent(String name, Date startDate, Date endDate){
         return new Event(name, startDate, endDate);
