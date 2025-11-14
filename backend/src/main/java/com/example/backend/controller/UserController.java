@@ -9,6 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.example.backend.dto.LoginRequest;
 import com.example.backend.dto.AuthResponse;
+import com.example.backend.repository.UserRepository;
+import com.example.backend.config.JwtService;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collections;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -18,6 +24,9 @@ public class UserController {
     @Autowired
     private AuthentificationService userService;
 
+    @Autowired
+    private JwtService jwtService;
+
     @PostMapping("/register")
     public User registerUser(@RequestBody RegisterRequest request) {
         User savedUser = userService.registerUser(request);
@@ -26,9 +35,24 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request){
+    public AuthResponse login(@RequestBody LoginRequest request) {
+
         User user = userService.login(request);
-        return new AuthResponse(user.getId(), user.getName(),user.getEmail());
+
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmail())
+                .password("")
+                .authorities(Collections.emptyList())
+                .build();
+
+        String token = jwtService.generateToken(userDetails);
+
+        return new AuthResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                token
+        );
     }
 
     @PutMapping("/change-password/{userId}")
