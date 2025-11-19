@@ -22,6 +22,9 @@ public class Participant {
     private @Getter @Setter String email;
     @Column(name = "attending", nullable = false)
     private @Getter @Setter Boolean attending;
+    @ManyToOne
+    @JoinColumn(name = "event_id", nullable = false)
+    private Event event;
 
     public Participant(String name, String email, Boolean attending){
         this.name = name;

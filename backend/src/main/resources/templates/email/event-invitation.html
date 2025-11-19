@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Invitation</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #650b77 0%, #e60076 100%); padding: 40px 30px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">You're Invited!</h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px 30px;">
+                            <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">
+                                Hello <strong>{PARTICIPANT_NAME}</strong>,
+                            </p>
+                            
+                            <p style="margin: 0 0 30px; color: #555555; font-size: 16px; line-height: 1.6;">
+                                We're excited to invite you to join us for an upcoming event!
+                            </p>
+                            
+                            <!-- Event Details Box -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8f9fa; border-radius: 6px; margin-bottom: 30px;">
+                                <tr>
+                                    <td style="padding: 25px;">
+                                        <h2 style="margin: 0 0 15px; color: #667eea; font-size: 22px; font-weight: bold;">
+                                            {EVENT_NAME}
+                                        </h2>
+                                        
+                                        <div style="margin-bottom: 15px;">
+                                            <span style="display: inline-block; color: #666666; font-size: 14px; font-weight: bold; margin-bottom: 5px;">📅 When</span>
+                                            <p style="margin: 0; color: #333333; font-size: 15px;">{EVENT_DATES}</p>
+                                        </div>
+                                        
+                                        <div style="margin-bottom: 15px;">
+                                            <span style="display: inline-block; color: #666666; font-size: 14px; font-weight: bold; margin-bottom: 5px;">📝 Description</span>
+                                            <p style="margin: 0; color: #333333; font-size: 15px; line-height: 1.5;">{EVENT_DESCRIPTION}</p>
+                                        </div>
+                                        
+                                        <div>
+                                            <span style="display: inline-block; color: #666666; font-size: 14px; font-weight: bold; margin-bottom: 5px;">👥 Organizers</span>
+                                            <p style="margin: 0; color: #333333; font-size: 15px;">{ORGANIZERS}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- CTA Button -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding: 20px 0;">
+                                        <a href="{INVITATION_LINK}" style="display: inline-block; background: linear-gradient(135deg, #650b77 0%, #e60076 100%); color: #ffffff; text-decoration: none; padding: 15px 40px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                                            View Invitation
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin: 20px 0 0; color: #777777; font-size: 14px; line-height: 1.6; text-align: center;">
+                                We hope to see you there!
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #e9ecef;">
+                            <p style="margin: 0; color: #999999; font-size: 12px;">
+                                This is an automated invitation. Please do not reply to this email.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -6,7 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "event")
@@ -43,10 +46,46 @@ public class Event {
     @Column(name = "location_id", nullable = false)
     private @Getter @Setter Long locationID;
 
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Participant> participants = new ArrayList<>();
+
     public Event(String name, Date startDate, Date endDate) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
+    public Event(String name,
+                 Date startDate,
+                 Date endDate,
+                 String description,
+                 String emailOrg1,
+                 String emailOrg2,
+                 Long locationID) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.description = description;
+        this.emailOrg1 = emailOrg1;
+        this.emailOrg2 = emailOrg2;
+        this.locationID = locationID;
+    }
+
+    public Event(String name,
+                 Date startDate,
+                 Date endDate,
+                 String description,
+                 String emailOrg1,
+                 String emailOrg2,
+                 Long locationID,
+                 List<Participant> participants) {
+        this(name, startDate, endDate, description, emailOrg1, emailOrg2, locationID);
+        this.participants = participants == null ? new ArrayList<>() : participants;
+        for (Participant p : this.participants) {
+            p.setEvent(this); 
+        }
+    }
+
+
 
 }
