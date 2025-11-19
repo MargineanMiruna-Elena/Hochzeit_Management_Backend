@@ -1,17 +1,16 @@
 package com.example.backend.controller;
 
 
-import com.example.backend.dto.ChangePasswordRequest;
-import com.example.backend.dto.RegisterRequest;
+import com.example.backend.dto.*;
 import com.example.backend.model.User;
 import com.example.backend.service.AuthentificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-import com.example.backend.dto.LoginRequest;
-import com.example.backend.dto.AuthResponse;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.config.JwtService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,6 +33,8 @@ public class UserController {
     private JwtService jwtService;
     @Autowired
     private HandlerMapping resourceHandlerMapping;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
@@ -79,6 +80,27 @@ public class UserController {
     @PutMapping("/change-password/{userId}")
     public void changePassword(@PathVariable Long userId, @RequestBody ChangePasswordRequest request) {
         userService.changePassword(userId, request.getOldPassword(), request.getNewPassword());
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<?> updateMyProfile(@RequestBody UpdateUserRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedUserEmail = authentication.getName();
+
+        User user = userRepository.findByEmail(loggedUserEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (request.getName() != null && !request.getName().isBlank()) {
+            user.setName(request.getName());
+        }
+
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            user.setEmail(request.getEmail());
+        }
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Profile updated successfully!!");
     }
 
 }
