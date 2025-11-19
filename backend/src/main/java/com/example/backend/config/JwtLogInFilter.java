@@ -34,6 +34,12 @@ public class JwtLogInFilter extends OncePerRequestFilter {
 
         System.out.println(">>> JwtLogInFilter: " + request.getMethod() + " " + request.getRequestURI());
 
+        String path = request.getServletPath();
+        if (path.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
         System.out.println("Authorization header = " + authHeader);
 
