@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.Date;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "event")
@@ -24,11 +26,11 @@ public class Event {
 
     @Temporal(TemporalType.DATE)
     @Column(name ="start_date", nullable = false)
-    private @Getter @Setter Date startDate;
+    private @Getter @Setter LocalDate startDate;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "end_date", nullable = false)
-    private @Getter @Setter Date endDate;
+    private @Getter @Setter LocalDate endDate;
 
     @Column(name = "description", nullable = false)
     private @Getter @Setter String description;
@@ -49,7 +51,7 @@ public class Event {
     @JoinColumn(name = "creator_id", insertable = false, updatable = false)
     private @Getter @Setter User creator;
 
-    public Event(String name, Date startDate, Date endDate) {
+    public Event(String name, LocalDate startDate, LocalDate endDate) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;

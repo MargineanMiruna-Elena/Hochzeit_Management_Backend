@@ -1,0 +1,165 @@
+package com.example.backend.controller;
+
+import com.example.backend.dto.CreateEventRequest;
+import com.example.backend.dto.UpdateEventRequest;
+import com.example.backend.dto.EventResponse;
+import com.example.backend.service.EventService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+import com.example.backend.repository.UserRepository;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/events")
+@CrossOrigin(origins = "*")
+public class EventController {
+
+    @Autowired
+    private EventService eventService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @PostMapping
+    public ResponseEntity<?> createEvent(@RequestBody CreateEventRequest request) {
+        try {
+            // Get authenticated user from JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            // Find user by email
+            Long userId = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            EventResponse response = eventService.createEvent(userId, request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllEvents() {
+        try {
+            List<EventResponse> events = eventService.getAllEvents();
+            return ResponseEntity.ok(events);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getEventById(@PathVariable Long id) {
+        try {
+            EventResponse response = eventService.getEventById(id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/my-events")
+    public ResponseEntity<?> getMyEvents() {
+        try {
+            // Get authenticated user from JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            // Find user by email
+            Long userId = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            List<EventResponse> events = eventService.getUserEvents(userId);
+            return ResponseEntity.ok(events);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<?> getEventDetail(@PathVariable Long id) {
+        try {
+            // Get authenticated user from JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            // Find user by email
+            Long userId = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            EventResponse response = eventService.getOrganizerEventById(userId, id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            if (e.getMessage().contains("permission")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateEvent(
+            @PathVariable Long id,
+            @RequestBody UpdateEventRequest request) {
+        try {
+            // Get authenticated user from JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            // Find user by email
+            Long userId = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            EventResponse response = eventService.updateEvent(userId, id, request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            if (e.getMessage().contains("permission")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
+        try {
+            // Get authenticated user from JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            // Find user by email
+            Long userId = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            eventService.deleteEvent(userId, id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            if (e.getMessage().contains("permission")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+}
