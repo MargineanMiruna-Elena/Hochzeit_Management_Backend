@@ -19,26 +19,42 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false)
     private @Getter @Setter String name;
 
     @Temporal(TemporalType.DATE)
+    @Column(name ="start_date", nullable = false)
     private @Getter @Setter Date startDate;
 
     @Temporal(TemporalType.DATE)
+    @Column(name = "end_date", nullable = false)
     private @Getter @Setter Date endDate;
 
+    @Column(name = "description", nullable = false)
     private @Getter @Setter String description;
 
+    @Column(name = "email_org1", nullable = false, updatable = false)
     private @Getter @Setter String emailOrg1;
 
+    @Column(name = "email_org2", nullable = false, updatable = false)
     private @Getter @Setter String emailOrg2;
 
+    @Column(name = "location_id", nullable = false)
     private @Getter @Setter Long locationID;
+
+    @Column(name = "creator_id", nullable = false)
+    private @Getter @Setter Long creatorId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_id", insertable = false, updatable = false)
+    private @Getter @Setter User creator;
 
     public Event(String name, Date startDate, Date endDate) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
+
 
 }
