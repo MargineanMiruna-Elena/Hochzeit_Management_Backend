@@ -21,7 +21,4 @@ public class User {
     private @Getter @Setter String password;
     private @Getter @Setter String name;
 
-    public Event createEvent(String name, Date startDate, Date endDate){
-        return new Event(name, startDate, endDate);
-    }
 }
