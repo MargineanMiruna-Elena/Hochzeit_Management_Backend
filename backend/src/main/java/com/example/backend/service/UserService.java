@@ -5,8 +5,11 @@ import com.example.backend.dto.RegisterRequest;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.example.backend.model.Event;
+import java.time.LocalDate;
 
 @Service
 public class UserService {
@@ -38,4 +41,12 @@ public class UserService {
         user.setPassword(null);
         return user;
     }
+
+    public Event createEvent(String name, LocalDate startDate, LocalDate endDate){
+        Event event = new Event();
+        event.setName(name);
+        event.setStartDate(startDate);
+        event.setEndDate(endDate);
+        return event;
+    };
 }
