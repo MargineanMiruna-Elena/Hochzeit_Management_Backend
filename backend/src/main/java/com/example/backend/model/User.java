@@ -32,7 +32,4 @@ public class User {
         this.name = name;
     }
 
-    public Event createEvent(String name, Date startDate, Date endDate){
-        return new Event(name, startDate, endDate);
-    }
 }
