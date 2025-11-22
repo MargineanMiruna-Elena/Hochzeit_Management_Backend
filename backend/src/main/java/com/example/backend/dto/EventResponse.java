@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -31,4 +32,7 @@ public class EventResponse {
     private String locationName;
 
     private String locationAddress;
+
+    public EventResponse(Long id, String name, LocalDate startDate, LocalDate endDate, String description, String emailOrg1, String emailOrg2, Long locationID, String s, String s1) {
+    }
 }
