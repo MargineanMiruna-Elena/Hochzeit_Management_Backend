@@ -6,30 +6,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.Date;
 
 @Entity
-@Table(name = "users")
+@Table(name = "location")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "location_id", nullable = false)
     private Long id;
-    @Column(name = "email", nullable = false, unique = true)
-    private @Getter @ Setter String email;
-    @Column(name = "password", nullable = false)
-    private @Getter @Setter String password;
+
     @Column(name = "name", nullable = false)
     private @Getter @Setter String name;
-    
 
-    public User(String email, String password, String name) {
-        this.email = email;
-        this.password = password;
+    @Column(name = "address", nullable = false)
+    private @Getter @Setter String address;
+
+    public Location(String name, String address) {
         this.name = name;
+        this.address = address;
     }
-
 }
