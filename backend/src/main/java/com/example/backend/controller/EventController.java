@@ -80,7 +80,7 @@ public class EventController {
                     .orElseThrow(() -> new RuntimeException("User not found"))
                     .getId();
 
-            List<EventResponse> events = eventService.getUserEvents(userId);
+            List<EventResponse> events = eventService.getEventsByOrganizer(userId);
             return ResponseEntity.ok(events);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
