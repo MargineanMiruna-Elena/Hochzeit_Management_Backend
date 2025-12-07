@@ -15,48 +15,44 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false)
-    private @Getter @Setter String name;
+    private String name;
 
     @Temporal(TemporalType.DATE)
     @Column(name ="start_date", nullable = false)
-    private @Getter @Setter LocalDate startDate;
+    private LocalDate startDate;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "end_date", nullable = false)
-    private @Getter @Setter LocalDate endDate;
+    private LocalDate endDate;
 
     @Column(name = "description", nullable = false)
-    private @Getter @Setter String description;
+    private String description;
 
     @Column(name = "email_org1", nullable = false, updatable = false)
-    private @Getter @Setter String emailOrg1;
+    private String emailOrg1;
 
     @Column(name = "email_org2", nullable = false, updatable = false)
-    private @Getter @Setter String emailOrg2;
+    private String emailOrg2;
 
     @Column(name = "location_id", nullable = false)
-    private @Getter @Setter Long locationID;
+    private Long locationID;
 
     @Column(name = "creator_id", nullable = false)
-    private @Getter @Setter Long creatorId;
+    private Long creatorId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", insertable = false, updatable = false)
-    private @Getter @Setter User creator;
+    private User creator;
 
     public Event(String name, LocalDate startDate, LocalDate endDate) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
     }
-
-
-
 }

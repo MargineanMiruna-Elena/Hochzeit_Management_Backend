@@ -145,7 +145,7 @@ public class EventService {
         }
     }
 
-    public List<EventResponse> getUserEvents(Long userId) {
+    public List<EventResponse> getEventsByOrganizer(Long userId) {
         // Verify user exists
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -153,29 +153,26 @@ public class EventService {
         String userEmail = user.getEmail();
 
         // Get events where user is creator OR organizer
-        List<Event> organizerEvents = eventRepository.findByEmailOrg1OrEmailOrg2(userEmail);
+        return eventRepository.findByEmailOrg1OrEmailOrg2(userEmail)
+                .stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+
+    }
+
+    public List<EventResponse> getEventsByParticipant(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        String userEmail = user.getEmail();
 
         // Get events where user is a participant/guest
-        List<Event> participantEvents = participantRepository.findEventsByUserEmail(userEmail)
+        return participantRepository.findEventsByUserEmail(userEmail)
                 .stream()
                 .distinct()
-                .collect(Collectors.toList());
-
-        // Combine and remove duplicates
-        List<Event> allEvents = organizerEvents.stream()
-                .collect(Collectors.toList());
-
-        participantEvents.forEach(event -> {
-            if (!allEvents.contains(event)) {
-                allEvents.add(event);
-            }
-        });
-
-        return allEvents.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
-
 
     public EventResponse getEventById(Long eventId) {
         Event event = eventRepository.findById(eventId)
@@ -326,17 +323,19 @@ public class EventService {
 
 
     private EventResponse convertToResponse(Event event, Location location) {
-        return new EventResponse(
-                event.getId(),
-                event.getName(),
-                event.getStartDate(),
-                event.getEndDate(),
-                event.getDescription(),
-                event.getEmailOrg1(),
-                event.getEmailOrg2(),
-                event.getLocationID(),
-                location != null ? location.getName() : null,
-                location != null ? location.getAddress() : null
-        );
+        EventResponse ev = new EventResponse();
+        ev.setId(event.getId());
+        ev.setName(event.getName());
+        ev.setDescription(event.getDescription());
+        ev.setStartDate(event.getStartDate());
+        ev.setEndDate(event.getEndDate());
+        ev.setEmailOrg1(event.getEmailOrg1());
+        ev.setEmailOrg2(event.getEmailOrg2());
+        ev.setCreatorId(event.getCreatorId());
+        ev.setLocationId(location.getId());
+        ev.setLocationName(location.getName());
+        ev.setLocationAddress(location.getAddress());
+
+        return ev;
     }
 }

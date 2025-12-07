@@ -32,7 +32,4 @@ public class EventResponse {
     private String locationName;
 
     private String locationAddress;
-
-    public EventResponse(Long id, String name, LocalDate startDate, LocalDate endDate, String description, String emailOrg1, String emailOrg2, Long locationID, String s, String s1) {
-    }
 }
