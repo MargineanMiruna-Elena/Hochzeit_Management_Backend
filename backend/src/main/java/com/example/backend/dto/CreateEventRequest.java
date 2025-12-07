@@ -34,4 +34,7 @@ public class CreateEventRequest {
     @NotNull(message = "Location ID is required")
     @Positive(message = "Location ID must be a positive number")
     private Long locationId;
+
+    @Size(max = 2048, message = "Image URL must not exceed 2048 characters")
+    private String imageUrl;
 }

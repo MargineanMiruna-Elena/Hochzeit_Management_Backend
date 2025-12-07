@@ -33,9 +33,11 @@ public class EventResponse {
 
     private String locationAddress;
 
+    private String imageUrl;
+
     public EventResponse(Long id, String name, LocalDate startDate, LocalDate endDate,
                          String description, String emailOrg1, String emailOrg2,
-                         Long locationId, String locationName, String locationAddress) {
+                         Long locationId, String locationName, String locationAddress, String imageUrl, Long creatorId) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -46,5 +48,7 @@ public class EventResponse {
         this.locationId = locationId;
         this.locationName = locationName;
         this.locationAddress = locationAddress;
+        this.imageUrl = imageUrl;
+        this.creatorId = creatorId;
     }
 }

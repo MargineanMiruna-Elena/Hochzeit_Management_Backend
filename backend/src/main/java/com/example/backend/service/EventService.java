@@ -122,6 +122,7 @@ public class EventService {
         event.setEmailOrg1(emailOrg1);      // Auto-filled from authenticated user
         event.setEmailOrg2(emailOrg2);      // Provided in request
         event.setLocationID(request.getLocationId());
+        event.setImageUrl(request.getImageUrl());  // Add this line
 
         Event savedEvent = eventRepository.save(event);
 
@@ -335,8 +336,10 @@ public class EventService {
                 event.getEmailOrg1(),
                 event.getEmailOrg2(),
                 event.getLocationID(),
+                event.getCreatorId(),
                 location != null ? location.getName() : null,
-                location != null ? location.getAddress() : null
+                location != null ? location.getAddress() : null,
+                event.getImageUrl()  // Add this line
         );
     }
 }
