@@ -16,6 +16,9 @@ import com.example.backend.config.JwtService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerMapping;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import java.util.stream.Collectors;
 
 import java.util.Collections;
 import java.util.Map;
@@ -83,24 +86,37 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<?> updateMyProfile(@RequestBody UpdateUserRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loggedUserEmail = authentication.getName();
-
-        User user = userRepository.findByEmail(loggedUserEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (request.getName() != null && !request.getName().isBlank()) {
-            user.setName(request.getName());
+    public ResponseEntity<?> updateMyProfile(@Valid @RequestBody UpdateUserRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errors = bindingResult.getAllErrors()
+                    .stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", errors));
         }
 
-        if (request.getEmail() != null && !request.getEmail().isBlank()) {
-            user.setEmail(request.getEmail());
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String loggedUserEmail = authentication.getName();
+
+            System.out.println("DEBUG: loggedUserEmail = " + loggedUserEmail);  // ✅ Add this
+            System.out.println("DEBUG: authentication = " + authentication);    // ✅ Add this
+
+            User currentUser = userRepository.findByEmail(loggedUserEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+            UpdateUserResponse response = userService.updateUserProfile(currentUser.getId(), request);
+
+            return ResponseEntity.ok(response);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(Map.of("error", e.getReason()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update profile"));
         }
-
-        userRepository.save(user);
-
-        return ResponseEntity.ok("Profile updated successfully!!");
     }
 
 }
