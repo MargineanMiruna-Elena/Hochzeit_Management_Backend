@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "participants")
+@Table(name = "participant")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,9 +25,6 @@ public class Participant {
 
     @Column(name = "attending", nullable = true)
     private @Getter @Setter Boolean attending;
-    @ManyToOne
-    @JoinColumn(name = "event_id", nullable = false)
-    private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)

@@ -9,7 +9,7 @@ import com.example.backend.enums.TransportationMethod;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "invitation_responses")
+@Table(name = "invitation_response")
 public class InvitationResponse {
     
     @Id
