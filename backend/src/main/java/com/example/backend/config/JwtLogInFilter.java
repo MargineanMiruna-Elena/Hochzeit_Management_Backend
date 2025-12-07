@@ -35,9 +35,9 @@ public class JwtLogInFilter extends OncePerRequestFilter {
         System.out.println(">>> JwtLogInFilter: " + request.getMethod() + " " + request.getRequestURI());
 
 
-        // changed to allow for /api/auth/me
+
         String path = request.getServletPath();
-        if (path.startsWith("/api/auth/register") || path.startsWith("/api/auth/login")) {
+        if (path.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
         }

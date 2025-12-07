@@ -33,6 +33,18 @@ public class EventResponse {
 
     private String locationAddress;
 
-    public EventResponse(Long id, String name, LocalDate startDate, LocalDate endDate, String description, String emailOrg1, String emailOrg2, Long locationID, String s, String s1) {
+    public EventResponse(Long id, String name, LocalDate startDate, LocalDate endDate,
+                         String description, String emailOrg1, String emailOrg2,
+                         Long locationId, String locationName, String locationAddress) {
+        this.id = id;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.description = description;
+        this.emailOrg1 = emailOrg1;
+        this.emailOrg2 = emailOrg2;
+        this.locationId = locationId;
+        this.locationName = locationName;
+        this.locationAddress = locationAddress;
     }
 }
