@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
+import com.example.backend.dto.UpdateUserRequest;
+import com.example.backend.dto.UpdateUserResponse;
+
 
 @Service
 public class AuthentificationService {
@@ -60,6 +64,40 @@ public class AuthentificationService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    @Transactional
+    public UpdateUserResponse updateUserProfile(Long userId, UpdateUserRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (!user.getEmail().equals(request.getEmail())) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Email already in use by another account"
+                );
+            }
+        }
+
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+
+        try {
+            User updated = userRepository.save(user);
+            return new UpdateUserResponse(
+                    updated.getId(),
+                    updated.getName(),
+                    updated.getEmail(),
+                    "Profile updated successfully"
+            );
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to update profile",
+                    e
+            );
+        }
     }
 
 }
