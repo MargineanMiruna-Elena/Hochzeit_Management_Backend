@@ -71,17 +71,7 @@ public class AuthentificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (!user.getEmail().equals(request.getEmail())) {
-            if (userRepository.existsByEmail(request.getEmail())) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT,
-                        "Email already in use by another account"
-                );
-            }
-        }
-
         user.setName(request.getName());
-        user.setEmail(request.getEmail());
 
         try {
             User updated = userRepository.save(user);

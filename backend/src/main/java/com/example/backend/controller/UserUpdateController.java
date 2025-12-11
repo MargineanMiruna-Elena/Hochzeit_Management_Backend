@@ -1,31 +1,35 @@
 package com.example.backend.controller;
 
+import com.example.backend.config.JwtService;
 import com.example.backend.dto.UpdateUserRequest;
 import com.example.backend.dto.UpdateUserResponse;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.AuthentificationService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.SQLOutput;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @RestController
+@RequestMapping("/api/update")
+@CrossOrigin(origins = "*")
 public class UserUpdateController {
 
     private AuthentificationService userService;
-
     private UserRepository userRepository;
 
     @PutMapping("/me")
