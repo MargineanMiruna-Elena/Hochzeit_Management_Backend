@@ -85,38 +85,4 @@ public class UserController {
         userService.changePassword(userId, request.getOldPassword(), request.getNewPassword());
     }
 
-    @PutMapping("/me")
-    public ResponseEntity<?> updateMyProfile(@Valid @RequestBody UpdateUserRequest request, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            String errors = bindingResult.getAllErrors()
-                    .stream()
-                    .map(error -> error.getDefaultMessage())
-                    .collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", errors));
-        }
-
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String loggedUserEmail = authentication.getName();
-
-            System.out.println("DEBUG: loggedUserEmail = " + loggedUserEmail);  // ✅ Add this
-            System.out.println("DEBUG: authentication = " + authentication);    // ✅ Add this
-
-            User currentUser = userRepository.findByEmail(loggedUserEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-            UpdateUserResponse response = userService.updateUserProfile(currentUser.getId(), request);
-
-            return ResponseEntity.ok(response);
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode())
-                    .body(Map.of("error", e.getReason()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to update profile"));
-        }
-    }
-
 }

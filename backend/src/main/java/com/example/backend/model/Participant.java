@@ -34,6 +34,10 @@ public class Participant {
     @JoinColumn(name = "user_id", nullable = true)
     private @Getter @Setter User user;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "menu_preference", nullable = true)
+    private @Getter @Setter MenuPreference menuPreference;
+
     public Participant(String name, String email, Boolean attending) {
         this.name = name;
         this.email = email;

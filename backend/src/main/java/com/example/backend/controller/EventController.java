@@ -11,9 +11,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.example.backend.repository.UserRepository;
+import org.springframework.validation.BindingResult;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/events")
@@ -116,7 +119,18 @@ public class EventController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEvent(
             @PathVariable Long id,
-            @RequestBody UpdateEventRequest request) {
+            @Valid @RequestBody UpdateEventRequest request,
+            BindingResult bindingResult) {
+        // Check validation errors
+        if (bindingResult.hasErrors()) {
+            String errors = bindingResult.getAllErrors()
+                    .stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", errors));
+        }
+
         try {
             // Get authenticated user from JWT
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

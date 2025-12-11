@@ -50,6 +50,9 @@ public class Event {
     @JoinColumn(name = "creator_id", insertable = false, updatable = false)
     private User creator;
 
+    @Column(name = "image_url", nullable = true)
+    private @Getter @Setter String imageUrl;
+
     public Event(String name, LocalDate startDate, LocalDate endDate) {
         this.name = name;
         this.startDate = startDate;
