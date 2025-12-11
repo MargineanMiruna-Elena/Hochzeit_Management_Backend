@@ -146,7 +146,7 @@ public class EventService {
         }
     }
 
-    public List<EventResponse> getUserEvents(Long userId) {
+    public List<EventResponse> getEventsByOrganizer(Long userId) {
         // Verify user exists
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -154,29 +154,26 @@ public class EventService {
         String userEmail = user.getEmail();
 
         // Get events where user is creator OR organizer
-        List<Event> organizerEvents = eventRepository.findByEmailOrg1OrEmailOrg2(userEmail);
+        return eventRepository.findByEmailOrg1OrEmailOrg2(userEmail)
+                .stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+
+    }
+
+    public List<EventResponse> getEventsByParticipant(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        String userEmail = user.getEmail();
 
         // Get events where user is a participant/guest
-        List<Event> participantEvents = participantRepository.findEventsByUserEmail(userEmail)
+        return participantRepository.findEventsByUserEmail(userEmail)
                 .stream()
                 .distinct()
-                .collect(Collectors.toList());
-
-        // Combine and remove duplicates
-        List<Event> allEvents = organizerEvents.stream()
-                .collect(Collectors.toList());
-
-        participantEvents.forEach(event -> {
-            if (!allEvents.contains(event)) {
-                allEvents.add(event);
-            }
-        });
-
-        return allEvents.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
-
 
     public EventResponse getEventById(Long eventId) {
         Event event = eventRepository.findById(eventId)
@@ -339,7 +336,7 @@ public class EventService {
                 event.getCreatorId(),
                 location != null ? location.getName() : null,
                 location != null ? location.getAddress() : null,
-                event.getImageUrl()  // Add this line
+                event.getImageUrl()
         );
     }
 }
