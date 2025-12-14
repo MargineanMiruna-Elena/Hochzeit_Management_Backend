@@ -1,11 +1,8 @@
 package com.example.backend.service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.example.backend.model.Event;
 import com.example.backend.model.InvitationResponse;
 import com.example.backend.model.Participant;
@@ -25,7 +22,12 @@ public class InvitationResponseService {
     @Autowired
     private ParticipantRepository participantRepository;
     
-    public InvitationResponseDTO updateInvitationResponse(Long eventId, Long participantId, InvitationResponse responseData, Boolean isAttending) {
+    public InvitationResponseDTO updateInvitationResponse(
+            Long eventId, 
+            Long participantId, 
+            String foodPreferences, 
+            Boolean isAttending) {
+        
         Optional<Event> eventOpt = eventRepository.findById(eventId);
         Optional<Participant> participantOpt = participantRepository.findById(participantId);
         
@@ -36,39 +38,20 @@ public class InvitationResponseService {
         Event event = eventOpt.get();
         Participant participant = participantOpt.get();
         
+        // Update participant's attending status
         participant.setAttending(isAttending);
         participantRepository.save(participant);
         
+        // Get or create invitation response
         InvitationResponse response = invitationResponseRepository
             .findByEventIdAndParticipantId(eventId, participantId)
             .orElse(new InvitationResponse(event, participant));
         
-//        if (response.getRespondedAt() == null) {
-//            response.setRespondedAt(LocalDateTime.now());
-//        }
-        
+        // Set food preferences only if attending
         if (Boolean.TRUE.equals(isAttending)) {
-            if (Boolean.TRUE.equals(event.getAskFoodPreferences())) {
-                if (responseData.getFoodPreferences() != null) {
-                    boolean allValid = responseData.getFoodPreferences().stream()
-                        .allMatch(pref -> event.getAvailableFoodPreferences().contains(pref));
-                    if (!allValid) {
-                        throw new IllegalArgumentException("Invalid food preferences selected");
-                    }
-                }
-                response.setFoodPreferences(responseData.getFoodPreferences());
-            }
-            
-            if (Boolean.TRUE.equals(event.getAskTransportation())) {
-                if (responseData.getTransportationMethod() != null && 
-                    !event.getAvailableTransportationMethods().contains(responseData.getTransportationMethod())) {
-                    throw new IllegalArgumentException("Invalid transportation method selected");
-                }
-                response.setTransportationMethod(responseData.getTransportationMethod());
-            }
+            response.setFoodPreferences(foodPreferences);
         } else {
             response.setFoodPreferences(null);
-            response.setTransportationMethod(null);
         }
         
         InvitationResponse savedResponse = invitationResponseRepository.save(response);

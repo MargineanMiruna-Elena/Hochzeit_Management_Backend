@@ -23,16 +23,14 @@ public class Participant {
     @Column(name = "email", nullable = false)
     private @Getter @Setter String email;
 
-    @Column(name = "attending", nullable = true)
+    @Column(name = "attending", nullable = true, columnDefinition = "BOOLEAN")
     private @Getter @Setter Boolean attending;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
     private @Getter @Setter Event event;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
-    private @Getter @Setter User user;
+   
 
     public Participant(String name, String email, Boolean attending) {
         this.name = name;

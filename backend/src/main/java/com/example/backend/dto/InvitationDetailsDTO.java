@@ -1,9 +1,11 @@
 package com.example.backend.dto;
 
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.example.backend.enums.FoodPreference;
-import com.example.backend.enums.TransportationMethod;
 import com.example.backend.model.Event;
 import com.example.backend.model.InvitationResponse;
 import com.example.backend.model.Participant;
@@ -35,27 +37,26 @@ public class InvitationDetailsDTO {
 
     public static class InvitationQuestionsDTO {
         private Boolean askFoodPreferences;
-        private Boolean askTransportation;
-        private Set<FoodPreference> availableFoodPreferences;
-        private Set<TransportationMethod> availableTransportationMethods;
+        private List<Map<String, String>> availableFoodPreferences;
 
         public InvitationQuestionsDTO(Event event) {
             this.askFoodPreferences = event.getAskFoodPreferences();
-            this.askTransportation = event.getAskTransportation();
-            this.availableFoodPreferences = event.getAvailableFoodPreferences();
-            this.availableTransportationMethods = event.getAvailableTransportationMethods();
-        }
+            
+            if (Boolean.TRUE.equals(this.askFoodPreferences)) {
+                this.availableFoodPreferences = Arrays.stream(FoodPreference.values())
+                    .map(fp -> Map.of(
+                        "value", fp.name(),
+                        "label", fp.getDisplayName()
+                    ))
+                    .collect(Collectors.toList());
+            }
+        }    
 
         public Boolean getAskFoodPreferences() { return askFoodPreferences; }
         public void setAskFoodPreferences(Boolean askFoodPreferences) { this.askFoodPreferences = askFoodPreferences; }
         
-        public Boolean getAskTransportation() { return askTransportation; }
-        public void setAskTransportation(Boolean askTransportation) { this.askTransportation = askTransportation; }
+        public List<Map<String, String>> getAvailableFoodPreferences() { return availableFoodPreferences; }
+        public void setAvailableFoodPreferences(List<Map<String, String>> availableFoodPreferences) { this.availableFoodPreferences = availableFoodPreferences; }
         
-        public Set<FoodPreference> getAvailableFoodPreferences() { return availableFoodPreferences; }
-        public void setAvailableFoodPreferences(Set<FoodPreference> availableFoodPreferences) { this.availableFoodPreferences = availableFoodPreferences; }
-        
-        public Set<TransportationMethod> getAvailableTransportationMethods() { return availableTransportationMethods; }
-        public void setAvailableTransportationMethods(Set<TransportationMethod> availableTransportationMethods) { this.availableTransportationMethods = availableTransportationMethods; }
     }
 }
