@@ -1,12 +1,11 @@
+// com.example.backend.dto.UpdateParticipantRequest
 package com.example.backend.dto;
 
 import lombok.Data;
 
-//to be implemented
-
 @Data
 public class UpdateParticipantRequest {
+    private String name;
     private String email;
-    private String newName;
-    private Long eventId;
+    private Boolean attending;
 }

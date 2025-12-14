@@ -1,0 +1,115 @@
+package com.example.backend.service.impl;
+
+import com.example.backend.dto.CreateParticipantRequest;
+import com.example.backend.dto.ParticipantResponse;
+import com.example.backend.dto.UpdateParticipantRequest;
+import com.example.backend.model.Event;
+import com.example.backend.model.Participant;
+import com.example.backend.repository.EventRepository;
+import com.example.backend.repository.ParticipantRepository;
+import com.example.backend.service.ParticipantService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Transactional
+public class ParticipantServiceImpl implements ParticipantService {
+
+    private final ParticipantRepository participantRepository;
+    private final EventRepository eventRepository;
+
+    public ParticipantServiceImpl(ParticipantRepository participantRepository,
+                                  EventRepository eventRepository) {
+        this.participantRepository = participantRepository;
+        this.eventRepository = eventRepository;
+    }
+
+    @Override
+    public ParticipantResponse createParticipant(CreateParticipantRequest request) {
+        Event event = eventRepository.findById(request.getEventId())
+                .orElseThrow(() -> new IllegalArgumentException("Event not found: " + request.getEventId()));
+
+        Participant participant = new Participant();
+        participant.setName(request.getName());
+        participant.setEmail(request.getEmail());
+        participant.setAttending(request.getAttending());
+        participant.setEvent(event);
+
+        Participant saved = participantRepository.save(participant);
+        return toResponse(saved);
+    }
+
+    @Override
+    public ParticipantResponse updateParticipant(Long participantId, UpdateParticipantRequest request) {
+        Participant participant = participantRepository.findById(participantId)
+                .orElseThrow(() -> new IllegalArgumentException("Participant not found: " + participantId));
+
+        if (request.getName() != null) {
+            participant.setName(request.getName());
+        }
+        if (request.getEmail() != null) {
+            participant.setEmail(request.getEmail());
+        }
+        if (request.getAttending() != null) {
+            participant.setAttending(request.getAttending());
+        }
+
+        Participant saved = participantRepository.save(participant);
+        return toResponse(saved);
+    }
+
+    @Override
+    public void deleteParticipant(Long participantId) {
+        if (!participantRepository.existsById(participantId)) {
+            throw new IllegalArgumentException("Participant not found: " + participantId);
+        }
+        participantRepository.deleteById(participantId);
+    }
+
+    @Override
+    public ParticipantResponse getParticipant(Long participantId) {
+        Participant participant = participantRepository.findById(participantId)
+                .orElseThrow(() -> new IllegalArgumentException("Participant not found: " + participantId));
+        return toResponse(participant);
+    }
+
+    @Override
+    public List<ParticipantResponse> getParticipantsByEvent(Long eventId) {
+        return participantRepository.findByEventId(eventId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<ParticipantResponse> getAcceptedParticipantsByEvent(Long eventId) {
+        return participantRepository.findByEventIdAndAttendingTrue(eventId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<ParticipantResponse> getDeclinedParticipantsByEvent(Long eventId) {
+        return participantRepository.findByEventIdAndAttendingFalse(eventId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<ParticipantResponse> getPendingParticipantsByEvent(Long eventId) {
+        return participantRepository.findByEventIdAndAttendingIsNull(eventId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    private ParticipantResponse toResponse(Participant participant) {
+        return new ParticipantResponse(
+                participant.getId(),
+                participant.getName(),
+                participant.getEmail(),
+                participant.getAttending(),
+                participant.getEvent() != null ? participant.getEvent().getId() : null
+        );
+    }
+}

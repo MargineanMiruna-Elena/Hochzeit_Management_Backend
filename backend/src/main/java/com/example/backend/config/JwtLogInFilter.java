@@ -32,12 +32,18 @@ public class JwtLogInFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+
+        String path = request.getServletPath();
+        if (path.startsWith("/api/invitation")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         System.out.println(">>> JwtLogInFilter: " + request.getMethod() + " " + request.getRequestURI());
 
 
-
-        String path = request.getServletPath();
-        if (path.startsWith("/api/auth")) {
+        // changed to allow for /api/auth/me
+        if (path.startsWith("/api/auth/register") || path.startsWith("/api/auth/login")) {
             filterChain.doFilter(request, response);
             return;
         }

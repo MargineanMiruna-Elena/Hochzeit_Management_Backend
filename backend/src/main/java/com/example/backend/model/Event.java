@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 
@@ -43,15 +40,11 @@ public class Event {
     @Column(name = "location_id", nullable = false)
     private Long locationID;
 
-    @Column(name = "creator_id", nullable = false)
-    private Long creatorId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id", insertable = false, updatable = false)
-    private User creator;
-
     @Column(name = "image_url", nullable = true)
-    private @Getter @Setter String imageUrl;
+    private String imageUrl;
+
+    @Column(name = "ask_food_preferences", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean askFoodPreferences = false;
 
     public Event(String name, LocalDate startDate, LocalDate endDate) {
         this.name = name;

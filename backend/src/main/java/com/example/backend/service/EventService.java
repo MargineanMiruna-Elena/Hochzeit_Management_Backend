@@ -324,19 +324,18 @@ public class EventService {
 
 
     private EventResponse convertToResponse(Event event, Location location) {
-        return new EventResponse(
-                event.getId(),
-                event.getName(),
-                event.getStartDate(),
-                event.getEndDate(),
-                event.getDescription(),
-                event.getEmailOrg1(),
-                event.getEmailOrg2(),
-                event.getLocationID(),
-                event.getCreatorId(),
-                location != null ? location.getName() : null,
-                location != null ? location.getAddress() : null,
-                event.getImageUrl()
-        );
+        EventResponse ev = new EventResponse();
+        ev.setId(event.getId());
+        ev.setName(event.getName());
+        ev.setDescription(event.getDescription());
+        ev.setStartDate(event.getStartDate());
+        ev.setEndDate(event.getEndDate());
+        ev.setEmailOrg1(event.getEmailOrg1());
+        ev.setEmailOrg2(event.getEmailOrg2());
+        ev.setLocationId(location.getId());
+        ev.setLocationName(location.getName());
+        ev.setLocationAddress(location.getAddress());
+
+        return ev;
     }
 }
