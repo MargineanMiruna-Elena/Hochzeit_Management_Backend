@@ -31,12 +31,18 @@ public class JwtLogInFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        
+        
+        String path = request.getServletPath();
+        if (path.startsWith("/api/invitation")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         System.out.println(">>> JwtLogInFilter: " + request.getMethod() + " " + request.getRequestURI());
 
 
         // changed to allow for /api/auth/me
-        String path = request.getServletPath();
         if (path.startsWith("/api/auth/register") || path.startsWith("/api/auth/login")) {
             filterChain.doFilter(request, response);
             return;

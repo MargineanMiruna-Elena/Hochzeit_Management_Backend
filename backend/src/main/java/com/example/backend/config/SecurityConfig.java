@@ -20,27 +20,29 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtLogInFilter jwtLogInFilter;
+    private final ParticipantTokenFilter participantTokenFilter;
 
-    public SecurityConfig(JwtLogInFilter jwtLogInFilter) {
+    public SecurityConfig(JwtLogInFilter jwtLogInFilter, 
+                         ParticipantTokenFilter participantTokenFilter) {
         this.jwtLogInFilter = jwtLogInFilter;
+        this.participantTokenFilter = participantTokenFilter;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> {})
-
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtLogInFilter, UsernamePasswordAuthenticationFilter.class);
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> 
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/invitation/**").permitAll() 
+                .requestMatchers("/api/auth/**").permitAll() 
+                .anyRequest().authenticated()
+            )
+            // Add ParticipantTokenFilter BEFORE JwtLogInFilter
+            .addFilterBefore(participantTokenFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(jwtLogInFilter, ParticipantTokenFilter.class);
 
         return http.build();
     }
