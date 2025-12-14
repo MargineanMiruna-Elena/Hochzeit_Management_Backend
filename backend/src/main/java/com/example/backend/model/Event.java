@@ -1,13 +1,12 @@
 package com.example.backend.model;
 
+import com.example.backend.config.JsonListConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.cglib.core.Local;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDate;
 
 @Entity
@@ -46,16 +45,17 @@ public class Event {
     @Column(name = "creator_id", nullable = false)
     private Long creatorId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id", insertable = false, updatable = false)
-    private User creator;
+    @Column(name = "image_url")
+    private String imageUrl;
 
-    @Column(name = "image_url", nullable = true)
-    private @Getter @Setter String imageUrl;
+    @Column(name = "event_images", columnDefinition = "JSON")
+    @Convert(converter = JsonListConverter.class)
+    private List<String> eventImages;
 
     public Event(String name, LocalDate startDate, LocalDate endDate) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.eventImages = new ArrayList<>();
     }
 }

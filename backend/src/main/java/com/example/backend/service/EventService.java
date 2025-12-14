@@ -18,9 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -119,10 +126,12 @@ public class EventService {
         event.setStartDate(request.getStartDate());
         event.setEndDate(request.getEndDate());
         event.setDescription(request.getDescription());
-        event.setEmailOrg1(emailOrg1);      // Auto-filled from authenticated user
-        event.setEmailOrg2(emailOrg2);      // Provided in request
+        event.setEmailOrg1(emailOrg1);
+        event.setEmailOrg2(emailOrg2);
         event.setLocationID(request.getLocationId());
-        event.setImageUrl(request.getImageUrl());  // Add this line
+        event.setImageUrl(request.getImageUrl());
+        event.setCreatorId(userId);
+        event.setEventImages(new ArrayList<>());
 
         Event savedEvent = eventRepository.save(event);
 
@@ -338,5 +347,131 @@ public class EventService {
                 location != null ? location.getAddress() : null,
                 event.getImageUrl()
         );
+    }
+
+    @Transactional
+    public String uploadPhotoToEvent(Long eventId, Long userId, MultipartFile file) {
+        // Step 1: Verify event exists
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+
+        // Step 2: Verify user exists
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Step 3: Check if user is organizer OR participant
+        String userEmail = user.getEmail();
+        boolean isCreator = event.getEmailOrg1().equalsIgnoreCase(userEmail);
+        boolean isSecondOrganizer = event.getEmailOrg2() != null && event.getEmailOrg2().equalsIgnoreCase(userEmail);
+        boolean isParticipant = participantRepository.existsByEventIdAndEmail(eventId, userEmail);
+
+        if (!isCreator && !isSecondOrganizer && !isParticipant) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You must be a participant or organizer of this event to upload photos");
+        }
+
+        try {
+            // Step 4: Validate file
+            if (file.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
+            }
+
+            // Step 5: Validate file type (only images)
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only image files are allowed");
+            }
+
+            // Step 6: Create upload directory if it doesn't exist
+            String uploadDir = "uploads/events/";
+            Path uploadPath = Paths.get(uploadDir + eventId);
+            Files.createDirectories(uploadPath);
+
+            // Step 7: Generate unique filename with UUID
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path filePath = uploadPath.resolve(fileName);
+
+            // Step 8: Save file to disk
+            Files.write(filePath, file.getBytes());
+
+            // Step 9: Store relative path in event's eventImages list
+            String relativePath = "uploads/events/" + eventId + "/" + fileName;
+            event.getEventImages().add(relativePath);
+            eventRepository.save(event);
+
+            return relativePath;
+
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to upload file: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getEventPhotos(Long eventId, Long userId) {
+        // Step 1: Verify event exists
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+
+        // Step 2: Verify user exists
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Step 3: Check if user is organizer OR participant
+        String userEmail = user.getEmail();
+        boolean isCreator = event.getEmailOrg1().equalsIgnoreCase(userEmail);
+        boolean isSecondOrganizer = event.getEmailOrg2() != null && event.getEmailOrg2().equalsIgnoreCase(userEmail);
+        boolean isParticipant = participantRepository.existsByEventIdAndEmail(eventId, userEmail);
+
+        if (!isCreator && !isSecondOrganizer && !isParticipant) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You must be a participant or organizer of this event to view photos");
+        }
+
+        // Step 4: Return all photos for the event
+        return event.getEventImages();
+    }
+
+    @Transactional
+    public void deletePhotoFromEvent(Long eventId, Long userId, String filePath) {
+        // Step 1: Verify event exists
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+
+        // Step 2: Verify user exists
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Step 3: Check if user is an organizer (only organizers can delete)
+        String userEmail = user.getEmail();
+        boolean isCreator = event.getEmailOrg1().equalsIgnoreCase(userEmail);
+        boolean isSecondOrganizer = event.getEmailOrg2() != null && event.getEmailOrg2().equalsIgnoreCase(userEmail);
+
+        if (!isCreator && !isSecondOrganizer) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only organizers can delete photos from this event");
+        }
+
+        try {
+            // Step 4: Check if photo exists in event's photo list
+            if (!event.getEventImages().contains(filePath)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Photo not found in event");
+            }
+
+            // Step 5: Delete file from disk
+            Path fileToDelete = Paths.get(filePath);
+            if (Files.exists(fileToDelete)) {
+                Files.delete(fileToDelete);
+            }
+
+            // Step 6: Remove from event's image list
+            event.getEventImages().remove(filePath);
+            eventRepository.save(event);
+
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to delete file: " + e.getMessage(), e);
+        }
     }
 }
