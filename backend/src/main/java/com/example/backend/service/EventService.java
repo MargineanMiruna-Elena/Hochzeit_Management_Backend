@@ -132,6 +132,7 @@ public class EventService {
         event.setImageUrl(request.getImageUrl());
         event.setCreatorId(userId);
         event.setEventImages(new ArrayList<>());
+        event.setHasParking(request.getHasParking());
 
         Event savedEvent = eventRepository.save(event);
 
@@ -266,6 +267,10 @@ public class EventService {
         }
         if (request.getLocationId() != null) {
             event.setLocationID(request.getLocationId());
+        }
+
+        if (request.getHasParking() != null) {
+            event.setHasParking(request.getHasParking());
         }
 
         try {

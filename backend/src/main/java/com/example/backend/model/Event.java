@@ -52,6 +52,9 @@ public class Event {
     @Convert(converter = JsonListConverter.class)
     private List<String> eventImages;
 
+    @Column(name = "has_parking", nullable = false)
+    private Boolean hasParking = false;
+
     public Event(String name, LocalDate startDate, LocalDate endDate) {
         this.name = name;
         this.startDate = startDate;
