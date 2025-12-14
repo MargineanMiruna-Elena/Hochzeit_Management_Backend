@@ -34,10 +34,10 @@ public class InvitationResponse {
     @Enumerated(EnumType.STRING)
     private TransportationMethod transportationMethod;
     
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-    
-    private LocalDateTime respondedAt;
+//    @Column(nullable = false)
+//    private LocalDateTime createdAt = LocalDateTime.now();
+//
+//    private LocalDateTime respondedAt;
 
     public InvitationResponse() {}
 
@@ -61,9 +61,9 @@ public class InvitationResponse {
     public TransportationMethod getTransportationMethod() { return transportationMethod; }
     public void setTransportationMethod(TransportationMethod transportationMethod) { this.transportationMethod = transportationMethod; }
     
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    
-    public LocalDateTime getRespondedAt() { return respondedAt; }
-    public void setRespondedAt(LocalDateTime respondedAt) { this.respondedAt = respondedAt; }
+//    public LocalDateTime getCreatedAt() { return createdAt; }
+//    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+//
+//    public LocalDateTime getRespondedAt() { return respondedAt; }
+//    public void setRespondedAt(LocalDateTime respondedAt) { this.respondedAt = respondedAt; }
 }

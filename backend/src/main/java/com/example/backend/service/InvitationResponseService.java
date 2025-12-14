@@ -43,9 +43,9 @@ public class InvitationResponseService {
             .findByEventIdAndParticipantId(eventId, participantId)
             .orElse(new InvitationResponse(event, participant));
         
-        if (response.getRespondedAt() == null) {
-            response.setRespondedAt(LocalDateTime.now());
-        }
+//        if (response.getRespondedAt() == null) {
+//            response.setRespondedAt(LocalDateTime.now());
+//        }
         
         if (Boolean.TRUE.equals(isAttending)) {
             if (Boolean.TRUE.equals(event.getAskFoodPreferences())) {

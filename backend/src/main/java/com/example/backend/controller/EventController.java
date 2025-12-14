@@ -3,7 +3,14 @@ package com.example.backend.controller;
 import com.example.backend.dto.CreateEventRequest;
 import com.example.backend.dto.UpdateEventRequest;
 import com.example.backend.dto.EventResponse;
+import com.example.backend.model.Event;
+import com.example.backend.model.Participant;
+import com.example.backend.repository.EventRepository;
+import com.example.backend.repository.InvitationResponseRepository;
+import com.example.backend.repository.ParticipantRepository;
 import com.example.backend.service.EventService;
+import com.example.backend.service.InvitationService;
+import com.example.backend.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +31,16 @@ public class EventController {
     private EventService eventService;
 
     @Autowired
+    private EventRepository eventRepository;
+
+    @Autowired
+    private ParticipantRepository participantRepository;
+
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private InvitationService invitationService;
 
     @PostMapping
     public ResponseEntity<?> createEvent(@RequestBody CreateEventRequest request) {
@@ -160,6 +176,29 @@ public class EventController {
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{eventId}/send-invitations")
+    public ResponseEntity<String> sendInvitationsToAll(@PathVariable Long eventId) {
+        try {
+            Event event = eventRepository.findById(eventId)
+                    .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+            List<Participant> participants = participantRepository.findByEventId(eventId);
+
+            if (participants.isEmpty()) {
+                return ResponseEntity.badRequest().body("No participants found for this event.");
+            }
+
+            invitationService.sendInvitations(event, participants);
+
+            return ResponseEntity.ok("Invitations sent successfully to " + participants.size() + " participants.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to send invitations: " + e.getMessage());
         }
     }
 }
