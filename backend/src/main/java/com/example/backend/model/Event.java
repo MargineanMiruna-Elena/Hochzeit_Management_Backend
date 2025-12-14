@@ -1,17 +1,13 @@
 package com.example.backend.model;
 
+import com.example.backend.config.JsonListConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-
-
+import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-
-import com.example.backend.enums.FoodPreference;
 
 @Entity
 @Table(name = "event")
@@ -46,20 +42,26 @@ public class Event {
     @Column(name = "location_id", nullable = false)
     private Long locationID;
 
-    @Column(name = "image_url", nullable = true)
+    @Column(name = "creator_id", nullable = false)
+    private Long creatorId;
+
+    @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "event_images", columnDefinition = "JSON")
+    @Convert(converter = JsonListConverter.class)
+    private List<String> eventImages;
 
-    
+    @Column(name = "has_parking", nullable = false)
+    private Boolean hasParking = false;
+
     @Column(name = "ask_food_preferences", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean askFoodPreferences = false;
-    
-    
+
     public Event(String name, LocalDate startDate, LocalDate endDate) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.eventImages = new ArrayList<>();
     }
-
-    
-}  
+}
