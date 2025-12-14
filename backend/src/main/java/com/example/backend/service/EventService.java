@@ -331,7 +331,6 @@ public class EventService {
         ev.setEndDate(event.getEndDate());
         ev.setEmailOrg1(event.getEmailOrg1());
         ev.setEmailOrg2(event.getEmailOrg2());
-        ev.setCreatorId(event.getCreatorId());
         ev.setLocationId(location.getId());
         ev.setLocationName(location.getName());
         ev.setLocationAddress(location.getAddress());
