@@ -43,4 +43,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     // Find all pending participants (no response yet)
     List<Participant> findByEventIdAndAttendingIsNull(Long eventId);
+
+    boolean existsByEventIdAndEmail(Long eventId, String userEmail);
 }

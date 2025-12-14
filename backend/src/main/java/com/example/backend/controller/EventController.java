@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.backend.repository.UserRepository;
 import org.springframework.validation.BindingResult;
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -213,6 +214,104 @@ public class EventController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to send invitations: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{eventId}/photos")
+    public ResponseEntity<?> uploadPhoto(
+            @PathVariable Long eventId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            // Get authenticated user from JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            // Find user by email
+            Long userId = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            // Upload photo via EventService
+            String filePath = eventService.uploadPhotoToEvent(eventId, userId, file);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of(
+                            "message", "Photo uploaded successfully",
+                            "filePath", filePath
+                    ));
+        } catch (Exception e) {
+            if (e.getMessage().contains("permission")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{eventId}/photos")
+    public ResponseEntity<?> getEventPhotos(@PathVariable Long eventId) {
+        try {
+            // Get authenticated user from JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            // Find user by email
+            Long userId = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            // Get photos via EventService
+            List<String> photos = eventService.getEventPhotos(eventId, userId);
+
+            return ResponseEntity.ok(Map.of("photos", photos));
+        } catch (Exception e) {
+            if (e.getMessage().contains("permission")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{eventId}/photos")
+    public ResponseEntity<?> deletePhoto(
+            @PathVariable Long eventId,
+            @RequestParam("filePath") String filePath) {
+        try {
+            // Get authenticated user from JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            // Find user by email
+            Long userId = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            // Delete photo via EventService
+            eventService.deletePhotoFromEvent(eventId, userId, filePath);
+
+            return ResponseEntity.ok(Map.of("message", "Photo deleted successfully"));
+        } catch (Exception e) {
+            if (e.getMessage().contains("permission")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 }

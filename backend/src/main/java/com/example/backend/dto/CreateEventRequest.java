@@ -37,4 +37,7 @@ public class CreateEventRequest {
 
     @Size(max = 2048, message = "Image URL must not exceed 2048 characters")
     private String imageUrl;
+
+    @NotNull(message = "hasParking is required")
+    private Boolean hasParking;
 }
