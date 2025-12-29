@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class UpdateLocationRequest {
     private String name;
     private String address;
+    private String coordinates;
 }

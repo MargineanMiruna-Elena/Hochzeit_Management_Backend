@@ -64,24 +64,18 @@ public class EventService {
         String emailOrg1 = creator.getEmail();
         String emailOrg2 = request.getEmailOrg2();
 
-        // Step 3: Validate emailOrg2
-        // 3a: Check emailOrg2 is not empty
-        if (emailOrg2 == null || emailOrg2.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Second organizer email (emailOrg2) is required");
-        }
-
         // 3b: Check emailOrg2 is different from emailOrg1 (no duplicates)
         if (emailOrg1.equalsIgnoreCase(emailOrg2)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Both organizers cannot be the same person. emailOrg1 and emailOrg2 must be different.");
         }
 
-        // 3c: Check emailOrg2 user exists in database
-        User secondOrganizer = userRepository.findByEmail(emailOrg2)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Second organizer with email '" + emailOrg2 + "' does not have an account. " +
-                                "Both organizers must be registered users."));
+        if (!emailOrg2.isBlank()) {
+            User secondOrganizer = userRepository.findByEmail(emailOrg2)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Second organizer with email '" + emailOrg2 + "' does not have an account. " +
+                                    "Both organizers must be registered users."));
+        }
 
         // Step 4: Validate all required fields BEFORE saving
         // 4a: Validate name is not blank
@@ -135,11 +129,6 @@ public class EventService {
         event.setHasParking(request.getHasParking());
 
         Event savedEvent = eventRepository.save(event);
-
-        // Step 6: Auto-create Organizer records for both organizers
-        // (within same transaction - if this fails, entire transaction rolls back)
-        createOrganizerIfNotExists(creator, emailOrg1);
-        createOrganizerIfNotExists(secondOrganizer, emailOrg2);
 
         return convertToResponse(savedEvent, location);
     }
@@ -349,6 +338,7 @@ public class EventService {
         ev.setLocationId(location.getId());
         ev.setLocationName(location.getName());
         ev.setLocationAddress(location.getAddress());
+        ev.setLocationCoordinates(location.getCoordinates());
 
         return ev;
     }

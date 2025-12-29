@@ -36,7 +36,7 @@ public class Event {
     @Column(name = "email_org1", nullable = false, updatable = false)
     private String emailOrg1;
 
-    @Column(name = "email_org2", nullable = false, updatable = false)
+    @Column(name = "email_org2", updatable = false)
     private String emailOrg2;
 
     @Column(name = "location_id", nullable = false)

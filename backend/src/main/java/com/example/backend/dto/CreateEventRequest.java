@@ -27,7 +27,6 @@ public class CreateEventRequest {
     @FutureOrPresent(message = "End date cannot be in the past")
     private LocalDate endDate;
 
-    @NotBlank(message = "Second organizer email (emailOrg2) is required")
     @Email(message = "Second organizer email must be valid")
     private String emailOrg2;
 
