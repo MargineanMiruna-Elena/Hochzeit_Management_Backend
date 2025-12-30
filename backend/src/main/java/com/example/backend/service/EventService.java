@@ -126,6 +126,7 @@ public class EventService {
         event.setImageUrl(request.getImageUrl());
         event.setCreatorId(userId);
         event.setEventImages(new ArrayList<>());
+        event.setFoodPreferences(request.getFoodPreferences());
         event.setHasParking(request.getHasParking());
 
         Event savedEvent = eventRepository.save(event);
@@ -339,6 +340,8 @@ public class EventService {
         ev.setLocationName(location.getName());
         ev.setLocationAddress(location.getAddress());
         ev.setLocationCoordinates(location.getCoordinates());
+        ev.setHasParking(event.getHasParking());
+        ev.setFoodPreferences(event.getFoodPreferences());
 
         return ev;
     }

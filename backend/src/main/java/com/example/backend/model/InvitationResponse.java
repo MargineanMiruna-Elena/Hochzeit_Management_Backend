@@ -26,9 +26,14 @@ public class InvitationResponse {
     
     @Column(name = "food_preferences", length = 500)
     private String foodPreferences;
-    
-    public InvitationResponse(Event event, Participant participant) {
+
+    @Column(name = "needs_parking")
+    private Boolean needsParking;
+
+    public InvitationResponse(Event event, Participant participant, String foodPreferences, Boolean needsParking) {
         this.event = event;
         this.participant = participant;
+        this.foodPreferences = foodPreferences;
+        this.needsParking = needsParking;
     }
 }

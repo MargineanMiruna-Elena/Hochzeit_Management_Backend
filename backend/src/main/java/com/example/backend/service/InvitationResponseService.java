@@ -26,7 +26,7 @@ public class InvitationResponseService {
             Long eventId, 
             Long participantId, 
             String foodPreferences, 
-            Boolean isAttending) {
+            Boolean isAttending, Boolean needsParking) {
         
         Optional<Event> eventOpt = eventRepository.findById(eventId);
         Optional<Participant> participantOpt = participantRepository.findById(participantId);
@@ -45,13 +45,15 @@ public class InvitationResponseService {
         // Get or create invitation response
         InvitationResponse response = invitationResponseRepository
             .findByEventIdAndParticipantId(eventId, participantId)
-            .orElse(new InvitationResponse(event, participant));
+            .orElse(new InvitationResponse(event, participant, foodPreferences, needsParking));
         
         // Set food preferences only if attending
         if (Boolean.TRUE.equals(isAttending)) {
             response.setFoodPreferences(foodPreferences);
+            response.setNeedsParking(needsParking);
         } else {
             response.setFoodPreferences(null);
+            response.setNeedsParking(null);
         }
         
         InvitationResponse savedResponse = invitationResponseRepository.save(response);

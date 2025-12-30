@@ -1,13 +1,18 @@
 package com.example.backend.model;
 
 import com.example.backend.config.JsonListConverter;
+import com.example.backend.enums.FoodPreference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "event")
@@ -22,15 +27,13 @@ public class Event {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Temporal(TemporalType.DATE)
     @Column(name ="start_date", nullable = false)
     private LocalDate startDate;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, length = 1000)
     private String description;
 
     @Column(name = "email_org1", nullable = false, updatable = false)
@@ -55,13 +58,9 @@ public class Event {
     @Column(name = "has_parking", nullable = false)
     private Boolean hasParking = false;
 
-    @Column(name = "ask_food_preferences", columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean askFoodPreferences = false;
-
-    public Event(String name, LocalDate startDate, LocalDate endDate) {
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.eventImages = new ArrayList<>();
-    }
+    @ElementCollection(targetClass = FoodPreference.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "event_food_preferences", joinColumns = @JoinColumn(name = "event_id"))
+    @Column(name = "food_preference")
+    @Enumerated(EnumType.STRING)
+    private Set<FoodPreference> foodPreferences = new HashSet<>();
 }

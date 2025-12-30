@@ -4,14 +4,17 @@ import com.example.backend.dto.CreateParticipantRequest;
 import com.example.backend.dto.ParticipantResponse;
 import com.example.backend.dto.UpdateParticipantRequest;
 import com.example.backend.model.Event;
+import com.example.backend.model.InvitationResponse;
 import com.example.backend.model.Participant;
 import com.example.backend.repository.EventRepository;
+import com.example.backend.repository.InvitationResponseRepository;
 import com.example.backend.repository.ParticipantRepository;
 import com.example.backend.service.ParticipantService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -19,11 +22,14 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     private final ParticipantRepository participantRepository;
     private final EventRepository eventRepository;
+    private final InvitationResponseRepository invitationResponseRepository;
 
     public ParticipantServiceImpl(ParticipantRepository participantRepository,
-                                  EventRepository eventRepository) {
+                                  EventRepository eventRepository,
+                                  InvitationResponseRepository invitationResponseRepository) {
         this.participantRepository = participantRepository;
         this.eventRepository = eventRepository;
+        this.invitationResponseRepository = invitationResponseRepository;
     }
 
     @Override
@@ -77,7 +83,8 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public List<ParticipantResponse> getParticipantsByEvent(Long eventId) {
-        return participantRepository.findByEventId(eventId).stream()
+        List<Participant> participants = participantRepository.findByEventId(eventId);
+        return participants.stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -104,12 +111,30 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     private ParticipantResponse toResponse(Participant participant) {
+        String foodPreference = null;
+        Boolean needsParking = null;
+
+        if (participant.getEvent() != null) {
+            Optional<InvitationResponse> invitationResponse =
+                    invitationResponseRepository.findByEventIdAndParticipantId(
+                            participant.getEvent().getId(),
+                            participant.getId()
+                    );
+
+            if (invitationResponse.isPresent()) {
+                foodPreference = invitationResponse.get().getFoodPreferences();
+                needsParking = invitationResponse.get().getNeedsParking();
+            }
+        }
+
         return new ParticipantResponse(
                 participant.getId(),
                 participant.getName(),
                 participant.getEmail(),
                 participant.getAttending(),
-                participant.getEvent() != null ? participant.getEvent().getId() : null
+                participant.getEvent() != null ? participant.getEvent().getId() : null,
+                foodPreference,
+                needsParking
         );
     }
 }

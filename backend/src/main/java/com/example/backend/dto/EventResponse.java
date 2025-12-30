@@ -1,9 +1,11 @@
 package com.example.backend.dto;
 
+import com.example.backend.enums.FoodPreference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -35,4 +37,8 @@ public class EventResponse {
     private String locationCoordinates;
 
     private String imageUrl;
+
+    private Boolean hasParking;
+
+    private Set<FoodPreference> foodPreferences;
 }

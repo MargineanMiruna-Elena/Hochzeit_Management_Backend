@@ -1,10 +1,12 @@
 package com.example.backend.dto;
 
+import com.example.backend.enums.FoodPreference;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -36,6 +38,9 @@ public class CreateEventRequest {
 
     @Size(max = 2048, message = "Image URL must not exceed 2048 characters")
     private String imageUrl;
+
+    @NotNull(message = "foodPreferences is required")
+    private Set<FoodPreference> foodPreferences;
 
     @NotNull(message = "hasParking is required")
     private Boolean hasParking;
