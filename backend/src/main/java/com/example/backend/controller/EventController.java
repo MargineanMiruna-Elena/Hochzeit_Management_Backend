@@ -10,6 +10,7 @@ import com.example.backend.repository.InvitationResponseRepository;
 import com.example.backend.repository.ParticipantRepository;
 import com.example.backend.service.EventService;
 import com.example.backend.service.InvitationService;
+import com.example.backend.service.LocationService;
 import com.example.backend.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,9 @@ public class EventController {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private LocationService locationService;
 
     @Autowired
     private EventRepository eventRepository;
@@ -108,6 +112,25 @@ public class EventController {
         }
     }
 
+    @GetMapping("/participants-events")
+    public ResponseEntity<?> getEventsByParticipant() {
+        try {
+            // Get authenticated user from JWT
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            // Find user by email
+            Long userId = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            List<EventResponse> events = eventService.getEventsByParticipant(userId);
+            return ResponseEntity.ok(events);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
 
     @GetMapping("/{id}/detail")
     public ResponseEntity<?> getEventDetail(@PathVariable Long id) {

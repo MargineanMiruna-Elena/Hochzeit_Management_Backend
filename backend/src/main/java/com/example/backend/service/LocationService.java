@@ -24,26 +24,32 @@ public class LocationService {
      */
     public LocationResponse createLocation(CreateLocationRequest request) {
         // Validate name is not blank
-        if (request.getName() == null || request.getName().isBlank()) {
+        if (request.getLocationName() == null || request.getLocationName().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Location name is required and cannot be blank");
         }
 
         // Validate address is not blank
-        if (request.getAddress() == null || request.getAddress().isBlank()) {
+        if (request.getLocationAddress() == null || request.getLocationAddress().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Location address is required and cannot be blank");
         }
 
+        // Validate coordinates are not blank
+        if (request.getLocationCoordinates() == null || request.getLocationCoordinates().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Location coordinates are required and cannot be blank");
+        }
+
         // Check if location with same name and address already exists
-        if (locationRepository.findByNameAndAddress(request.getName(), request.getAddress()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Location with this name and address already exists");
+        if (locationRepository.findByNameAndAddress(request.getLocationName(), request.getLocationAddress()).isPresent()) {
+            return convertToResponse(locationRepository.findByNameAndAddress(request.getLocationName(), request.getLocationAddress()).get());
         }
 
         Location location = new Location();
-        location.setName(request.getName().trim());
-        location.setAddress(request.getAddress().trim());
+        location.setName(request.getLocationName().trim());
+        location.setAddress(request.getLocationAddress().trim());
+        location.setCoordinates(request.getLocationCoordinates().trim());
 
         try {
             Location savedLocation = locationRepository.save(location);
@@ -122,6 +128,10 @@ public class LocationService {
             location.setAddress(request.getAddress().trim());
         }
 
+        if (request.getCoordinates() != null && !request.getCoordinates().isBlank()) {
+            location.setCoordinates(request.getCoordinates().trim());
+        }
+
         try {
             Location updatedLocation = locationRepository.save(location);
             return convertToResponse(updatedLocation);
@@ -155,7 +165,8 @@ public class LocationService {
         return new LocationResponse(
                 location.getId(),
                 location.getName(),
-                location.getAddress()
+                location.getAddress(),
+                location.getCoordinates()
         );
     }
 }

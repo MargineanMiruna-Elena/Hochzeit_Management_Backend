@@ -19,13 +19,11 @@ public class Location {
     private Long id;
 
     @Column(name = "name", nullable = false)
-    private @Getter @Setter String name;
+    private String name;
 
     @Column(name = "address", nullable = false)
-    private @Getter @Setter String address;
+    private String address;
 
-    public Location(String name, String address) {
-        this.name = name;
-        this.address = address;
-    }
+    @Column(name = "coordinates", nullable = false)
+    private String coordinates;
 }

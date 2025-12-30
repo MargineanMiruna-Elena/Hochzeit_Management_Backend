@@ -52,7 +52,7 @@ public class InvitationService {
                 try {
                     // Create invitation response entry if it doesn't exist
                     if (!invitationResponseRepository.existsByEventIdAndParticipantId(event.getId(), p.getId())) {
-                        InvitationResponse invitationResponse = new InvitationResponse(event, p);
+                        InvitationResponse invitationResponse = new InvitationResponse(event, p, null, null);
                         invitationResponseRepository.save(invitationResponse);
                     }
                     
