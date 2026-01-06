@@ -1,5 +1,6 @@
 package com.example.backend.model;
 
+import com.example.backend.enums.FoodPreference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,11 +31,9 @@ public class Participant {
     @JoinColumn(name = "event_id", nullable = false)
     private @Getter @Setter Event event;
 
-   
-
     @Enumerated(EnumType.STRING)
     @Column(name = "menu_preference", nullable = true)
-    private @Getter @Setter MenuPreference menuPreference;
+    private @Getter @Setter FoodPreference menuPreference;
 
     public Participant(String name, String email, Boolean attending) {
         this.name = name;

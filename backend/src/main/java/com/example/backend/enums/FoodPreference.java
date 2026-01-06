@@ -1,10 +1,9 @@
 package com.example.backend.enums;
 
 public enum FoodPreference {
-    VEGETARIAN("Vegetarian"),
+    STANDARD("Standard"),
     VEGAN("Vegan"),
-    GLUTEN_FREE("Gluten Free"),
-    NO_PREFERENCE("No Preference");
+    KIDS("Kids");
 
     private final String displayName;
 

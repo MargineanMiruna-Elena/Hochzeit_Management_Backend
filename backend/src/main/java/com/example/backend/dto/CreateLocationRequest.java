@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateLocationRequest {
-    public String name;
-    public String address;
+    public String locationName;
+    public String locationAddress;
+    public String locationCoordinates;
 }

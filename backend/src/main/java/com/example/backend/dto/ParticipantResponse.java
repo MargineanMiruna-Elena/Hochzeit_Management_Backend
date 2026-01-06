@@ -14,4 +14,6 @@ public class ParticipantResponse {
     private String email;
     private Boolean attending;
     private Long eventId;
+    private String foodPreference;
+    private Boolean needsParking;
 }

@@ -27,4 +27,6 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 
     // Find location by name and address (exact match)
     Optional<Location> findByNameAndAddress(String name, String address);
+
+    Optional<Location> findLocationById(Long locationID);
 }
