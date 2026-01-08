@@ -32,8 +32,13 @@ public class JwtLogInFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-
         String path = request.getServletPath();
+
+        if (path.startsWith("/uploads/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (path.startsWith("/api/invitation")) {
             filterChain.doFilter(request, response);
             return;

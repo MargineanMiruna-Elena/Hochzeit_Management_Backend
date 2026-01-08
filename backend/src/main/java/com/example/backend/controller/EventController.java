@@ -8,10 +8,7 @@ import com.example.backend.model.Participant;
 import com.example.backend.repository.EventRepository;
 import com.example.backend.repository.InvitationResponseRepository;
 import com.example.backend.repository.ParticipantRepository;
-import com.example.backend.service.EventService;
-import com.example.backend.service.InvitationService;
-import com.example.backend.service.LocationService;
-import com.example.backend.service.ParticipantService;
+import com.example.backend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +36,9 @@ public class EventController {
     private LocationService locationService;
 
     @Autowired
+    private ImageStorageService storageService;
+
+    @Autowired
     private EventRepository eventRepository;
 
     @Autowired
@@ -49,6 +49,8 @@ public class EventController {
 
     @Autowired
     private InvitationService invitationService;
+    @Autowired
+    private InvitationResponseRepository invitationResponseRepository;
 
     @PostMapping
     public ResponseEntity<?> createEvent(@RequestBody CreateEventRequest request) {
@@ -68,6 +70,17 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", e.getMessage()));
         }
+    }
+
+    @PostMapping("/{eventId}/upload-cover")
+    public ResponseEntity<?> uploadCoverImage(@PathVariable Long eventId, @RequestParam("file") MultipartFile file) {
+        String fileName = storageService.store(file);
+
+        Event event = eventRepository.findById(eventId).orElseThrow();
+        event.setImageUrl(fileName);
+        eventRepository.save(event);
+
+        return ResponseEntity.ok(Map.of("imageUrl", fileName));
     }
 
     @GetMapping
@@ -237,6 +250,23 @@ public class EventController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to send invitations: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{eventId}/send-invitation/{participantId}")
+    public ResponseEntity<?> sendIndividualInvitation(@PathVariable Long eventId, @PathVariable Long participantId) {
+        try {
+            Event event = eventRepository.findById(eventId)
+                    .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+            Participant participant = participantRepository.findById(participantId)
+                    .orElseThrow(() -> new RuntimeException("Participant not found with id: " + participantId));
+
+            invitationService.sendInvitations(event, List.of(participant));
+            return ResponseEntity.ok("Invitation sent successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Email failed: " + e.getMessage());
         }
     }
 

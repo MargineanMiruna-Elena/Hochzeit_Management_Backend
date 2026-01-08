@@ -263,6 +263,9 @@ public class EventService {
             event.setHasParking(request.getHasParking());
         }
 
+
+        event.setImageUrl(request.getImageUrl());
+
         try {
             Event updatedEvent = eventRepository.save(event);
             return convertToResponse(updatedEvent);
@@ -341,6 +344,7 @@ public class EventService {
         ev.setLocationAddress(location.getAddress());
         ev.setLocationCoordinates(location.getCoordinates());
         ev.setHasParking(event.getHasParking());
+        ev.setImageUrl(event.getImageUrl());
         ev.setFoodPreferences(event.getFoodPreferences());
 
         return ev;

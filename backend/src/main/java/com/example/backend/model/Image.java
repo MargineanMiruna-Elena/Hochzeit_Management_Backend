@@ -29,5 +29,5 @@ public class Image {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploader_id", nullable = false)
-    private Participant uploader;
+    private User uploader;
 }

@@ -18,4 +18,6 @@ public interface InvitationResponseRepository extends JpaRepository<InvitationRe
     List<InvitationResponse> findByParticipantId(Long participantId);
     
     boolean existsByEventIdAndParticipantId(Long eventId, Long participantId);
+
+    void deleteByParticipantId(Long participantId);
 }

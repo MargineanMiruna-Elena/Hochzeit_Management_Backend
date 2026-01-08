@@ -18,4 +18,6 @@ public interface ParticipantTokenRepository extends JpaRepository<ParticipantTok
     void deleteByExpiresAtBefore(LocalDateTime dateTime);
     
     boolean existsByToken(String token);
+
+    void deleteByParticipantId(Long participantId);
 }
