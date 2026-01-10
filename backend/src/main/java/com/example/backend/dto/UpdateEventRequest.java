@@ -31,10 +31,8 @@ public class UpdateEventRequest {
     @Size(min = 10, max = 1000, message = "Event description must be between 10 and 1000 characters")
     private String description;
 
-    @FutureOrPresent(message = "Start date cannot be in the past")
     private LocalDate startDate;
 
-    @FutureOrPresent(message = "End date cannot be in the past")
     private LocalDate endDate;
 
     @Positive(message = "Location ID must be a positive number")
