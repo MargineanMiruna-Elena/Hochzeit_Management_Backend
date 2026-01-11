@@ -3,10 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dto.CreateEventRequest;
 import com.example.backend.dto.UpdateEventRequest;
 import com.example.backend.dto.EventResponse;
-import com.example.backend.model.Event;
-import com.example.backend.model.Location;
-import com.example.backend.model.User;
-import com.example.backend.model.Organizer;
+import com.example.backend.model.*;
 import com.example.backend.repository.EventRepository;
 import com.example.backend.repository.LocationRepository;
 import com.example.backend.repository.UserRepository;
@@ -27,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -168,11 +166,18 @@ public class EventService {
         String userEmail = user.getEmail();
 
         // Get events where user is a participant/guest
-        return participantRepository.findEventsByUserEmail(userEmail)
-                .stream()
-                .distinct()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+        List<Event> events = participantRepository.findEventsByUserEmail(userEmail);
+        List<Event> acceptedEvents = new ArrayList<>();
+
+        for (Event e: events) {
+            Optional<Participant> participant = participantRepository.findByEmailAndEventId(userEmail, e.getId());
+
+            if (participant.get().getAttending()) {
+                acceptedEvents.add(e);
+            }
+        }
+
+        return acceptedEvents.stream().map(this::convertToResponse).toList();
     }
 
     public EventResponse getEventById(Long eventId) {
