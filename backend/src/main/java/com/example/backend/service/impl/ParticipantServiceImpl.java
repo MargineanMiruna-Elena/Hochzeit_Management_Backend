@@ -9,6 +9,7 @@ import com.example.backend.model.Participant;
 import com.example.backend.repository.EventRepository;
 import com.example.backend.repository.InvitationResponseRepository;
 import com.example.backend.repository.ParticipantRepository;
+import com.example.backend.repository.ParticipantTokenRepository;
 import com.example.backend.service.ParticipantService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +24,16 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantRepository participantRepository;
     private final EventRepository eventRepository;
     private final InvitationResponseRepository invitationResponseRepository;
+    private final ParticipantTokenRepository participantTokenRepository;
 
     public ParticipantServiceImpl(ParticipantRepository participantRepository,
                                   EventRepository eventRepository,
-                                  InvitationResponseRepository invitationResponseRepository) {
+                                  InvitationResponseRepository invitationResponseRepository,
+                                  ParticipantTokenRepository participantTokenRepository) {
         this.participantRepository = participantRepository;
         this.eventRepository = eventRepository;
         this.invitationResponseRepository = invitationResponseRepository;
+        this.participantTokenRepository = participantTokenRepository;
     }
 
     @Override
@@ -71,6 +75,9 @@ public class ParticipantServiceImpl implements ParticipantService {
         if (!participantRepository.existsById(participantId)) {
             throw new IllegalArgumentException("Participant not found: " + participantId);
         }
+
+        invitationResponseRepository.deleteByParticipantId(participantId);
+        participantTokenRepository.deleteByParticipantId(participantId);
         participantRepository.deleteById(participantId);
     }
 

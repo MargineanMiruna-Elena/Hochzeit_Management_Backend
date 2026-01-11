@@ -36,9 +36,10 @@ public class SecurityConfig {
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/invitation/**").permitAll() 
-                .requestMatchers("/api/auth/**").permitAll() 
-                .anyRequest().authenticated()
+                    .requestMatchers("/api/invitation/**").permitAll()
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/uploads/**").permitAll()
+                    .anyRequest().authenticated()
             )
             // Add ParticipantTokenFilter BEFORE JwtLogInFilter
             .addFilterBefore(participantTokenFilter, UsernamePasswordAuthenticationFilter.class)
